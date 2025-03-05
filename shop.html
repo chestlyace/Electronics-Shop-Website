@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop - TechStore</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -43,6 +44,7 @@
     <style>
         /* Custom styles for range slider */
         input[type="range"] {
+            appearance: none;
             -webkit-appearance: none;
             width: 100%;
             height: 4px;
@@ -52,6 +54,7 @@
         }
 
         input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
             -webkit-appearance: none;
             width: 16px;
             height: 16px;
@@ -87,7 +90,7 @@
     <nav class="bg-white dark:bg-dark-card shadow sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center p-4">
             <div class="flex items-center">
-                <a href="index.html">
+                <a href="home.html">
                     <img src="images/logo.jpg" alt="Logo" class="h-8">
                 </a>
             </div>
@@ -98,8 +101,12 @@
                         id="searchInput" 
                         placeholder="Search products..." 
                         class="w-full p-3 border rounded-lg pl-10 pr-4 dark:bg-gray-800 dark:text-white dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onkeyup="handleSearch()"
                     >
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div id="searchResults" class="absolute w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg hidden z-50 max-h-96 overflow-y-auto">
+                    <!-- Search results will be populated here -->
                 </div>
             </div>
             <div class="flex items-center space-x-6">
@@ -112,12 +119,12 @@
                         <span id="cartCounter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
                     </a>
                 </div>
-                <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
-                    <i class="fas fa-heart"></i>
-                </a>
-                <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
-                    <i class="fas fa-user"></i>
-                </a>
+                <div class="relative">
+                    <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                        <i class="fas fa-heart"></i>
+                        <span id="favouritesCounter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -128,7 +135,7 @@
             <nav class="flex" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
-                        <a href="index.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                        <a href="home.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
                             <i class="fas fa-home mr-2"></i>
                             Home
                         </a>
@@ -184,7 +191,7 @@
                 <div class="bg-white dark:bg-dark-card rounded-lg shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold">Filters</h2>
-                        <button class="text-blue-600 dark:text-blue-400 text-sm hover:underline">Clear All</button>
+                        <button id="clearFilters" class="text-blue-600 dark:text-blue-400 text-sm hover:underline">Clear All</button>
                     </div>
 
                     <!-- Categories -->
@@ -192,15 +199,15 @@
                         <h3 class="font-semibold mb-3">Categories</h3>
                         <div class="space-y-2">
                             <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox text-blue-600 rounded">
+                                <input type="checkbox" name="category" value="Phones" class="form-checkbox text-blue-600 rounded">
                                 <span class="ml-2">Phones</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox text-blue-600 rounded">
+                                <input type="checkbox" name="category" value="Laptops" class="form-checkbox text-blue-600 rounded">
                                 <span class="ml-2">Laptops</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox text-blue-600 rounded">
+                                <input type="checkbox" name="category" value="Accessories" class="form-checkbox text-blue-600 rounded">
                                 <span class="ml-2">Accessories</span>
                             </label>
                         </div>
@@ -211,8 +218,8 @@
                         <h3 class="font-semibold mb-3">Price Range</h3>
                         <input type="range" min="0" max="2000" value="1000" class="mb-2">
                         <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                            <span>$0</span>
-                            <span>$2000</span>
+                            <span>FCFA0</span>
+                            <span>FCFA2000000</span>
                         </div>
                     </div>
 
@@ -221,19 +228,19 @@
                         <h3 class="font-semibold mb-3">Brands</h3>
                         <div class="space-y-2">
                             <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox text-blue-600 rounded">
+                                <input type="checkbox" name="brand" value="Apple" class="form-checkbox text-blue-600 rounded">
                                 <span class="ml-2">Apple</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox text-blue-600 rounded">
+                                <input type="checkbox" name="brand" value="Samsung" class="form-checkbox text-blue-600 rounded">
                                 <span class="ml-2">Samsung</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox text-blue-600 rounded">
+                                <input type="checkbox" name="brand" value="HP" class="form-checkbox text-blue-600 rounded">
                                 <span class="ml-2">HP</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="checkbox" class="form-checkbox text-blue-600 rounded">
+                                <input type="checkbox" name="brand" value="Dell" class="form-checkbox text-blue-600 rounded">
                                 <span class="ml-2">Dell</span>
                             </label>
                         </div>
@@ -244,7 +251,7 @@
                         <h3 class="font-semibold mb-3">Ratings</h3>
                         <div class="space-y-2">
                             <label class="flex items-center">
-                                <input type="radio" name="rating" class="form-radio text-blue-600">
+                                <input type="radio" name="rating" value="5" class="form-radio text-blue-600">
                                 <span class="ml-2 flex items-center">
                                     <i class="fas fa-star text-yellow-400"></i>
                                     <i class="fas fa-star text-yellow-400"></i>
@@ -254,7 +261,7 @@
                                 </span>
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="rating" class="form-radio text-blue-600">
+                                <input type="radio" name="rating" value="4" class="form-radio text-blue-600">
                                 <span class="ml-2 flex items-center">
                                     <i class="fas fa-star text-yellow-400"></i>
                                     <i class="fas fa-star text-yellow-400"></i>
@@ -264,7 +271,7 @@
                                 </span>
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="rating" class="form-radio text-blue-600">
+                                <input type="radio" name="rating" value="3" class="form-radio text-blue-600">
                                 <span class="ml-2 flex items-center">
                                     <i class="fas fa-star text-yellow-400"></i>
                                     <i class="fas fa-star text-yellow-400"></i>
@@ -280,7 +287,7 @@
                     <div class="mb-6">
                         <h3 class="font-semibold mb-3">Availability</h3>
                         <label class="flex items-center">
-                            <input type="checkbox" class="form-checkbox text-blue-600 rounded">
+                            <input type="checkbox" name="inStock" class="form-checkbox text-blue-600 rounded">
                             <span class="ml-2">In Stock Only</span>
                         </label>
                     </div>
@@ -288,11 +295,11 @@
                     <!-- Sort By -->
                     <div>
                         <h3 class="font-semibold mb-3">Sort By</h3>
-                        <select class="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700">
-                            <option>Price: Low to High</option>
-                            <option>Price: High to Low</option>
-                            <option>Popularity</option>
-                            <option>Latest</option>
+                        <select name="sort" class="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700">
+                            <option value="price-low-high">Price: Low to High</option>
+                            <option value="price-high-low">Price: High to Low</option>
+                            <option value="popularity">Popularity</option>
+                            <option value="latest">Latest</option>
                         </select>
                     </div>
                 </div>
@@ -300,7 +307,7 @@
 
             <!-- Product Grid -->
             <div class="lg:w-3/4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Product Card 1 -->
                     <div class="bg-white dark:bg-dark-card rounded-lg shadow-lg overflow-hidden group">
                         <div class="relative">
@@ -334,7 +341,7 @@
                                 <button onclick="addToCart('iPhone 13 Pro', 879.99)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
                                     Add to Cart
                                 </button>
-                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg">
+                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg" onclick="addToFavourites('iPhone 13 Pro')">
                                     <i class="fas fa-heart"></i>
                                 </button>
                             </div>
@@ -373,7 +380,7 @@
                                 <button onclick="addToCart('MacBook Pro M2', 1499.99)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
                                     Add to Cart
                                 </button>
-                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg">
+                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg" onclick="addToFavourites('MacBook Pro M2')">
                                     <i class="fas fa-heart"></i>
                                 </button>
                             </div>
@@ -413,7 +420,7 @@
                                 <button onclick="addToCart('Samsung Galaxy S22', 764.99)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
                                     Add to Cart
                                 </button>
-                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg">
+                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg" onclick="addToFavourites('Samsung Galaxy S22')">
                                     <i class="fas fa-heart"></i>
                                 </button>
                             </div>
@@ -451,7 +458,7 @@
                                 <button onclick="addToCart('AirPods Pro', 249.99)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
                                     Add to Cart
                                 </button>
-                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg">
+                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg" onclick="addToFavourites('AirPods Pro')">
                                     <i class="fas fa-heart"></i>
                                 </button>
                             </div>
@@ -491,7 +498,7 @@
                                 <button onclick="addToCart('Dell XPS 13', 974.99)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
                                     Add to Cart
                                 </button>
-                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg">
+                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg" onclick="addToFavourites('Dell XPS 13')">
                                     <i class="fas fa-heart"></i>
                                 </button>
                             </div>
@@ -530,7 +537,7 @@
                                 <button onclick="addToCart('Sony WH-1000XM4', 349.99)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
                                     Add to Cart
                                 </button>
-                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg">
+                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg" onclick="addToFavourites('Sony WH-1000XM4')">
                                     <i class="fas fa-heart"></i>
                                 </button>
                             </div>
@@ -542,7 +549,7 @@
                         <div class="relative">
                             <img src="https://via.placeholder.com/300x300" alt="iPad Pro" class="w-full h-48 object-cover">
                             <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <button onclick="openQuickView('iPad Pro 12.9\"')" class="bg-white text-gray-900 px-4 py-2 rounded-lg transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                <button onclick="openQuickView('iPad Pro 12.9')" class="bg-white text-gray-900 px-4 py-2 rounded-lg transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                                     Quick View
                                 </button>
                             </div>
@@ -567,11 +574,11 @@
                                 </div>
                             </div>
                             <div class="flex space-x-2">
-                                <button onclick="addToCart('iPad Pro 12.9\', 989.99)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                <button onclick="addToCart('iPad Pro 12.9', 989.99)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
                                    
                                     Add to Cart
                                 </button>
-                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg">
+                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg" onclick="addToFavourites('iPad Pro 12.9')">
                                     <i class="fas fa-heart"></i>
                                 </button>
                             </div>
@@ -674,13 +681,13 @@
                                 <span class="text-gray-500 text-sm ml-2">(128 reviews)</span>
                             </div>
                             <div class="mb-4">
-                                <span class="text-2xl font-bold text-blue-600">$879.99</span>
-                                <span class="text-gray-500 line-through ml-2">$1099.99</span>
+                                <span id="quickViewPrice" class="text-2xl font-bold text-blue-600">$879.99</span>
+                                <span id="quickViewOriginalPrice" class="text-gray-500 line-through ml-2">$1099.99</span>
                             </div>
-                            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                            <p id="quickViewDescription" class="text-gray-600 dark:text-gray-400 mb-4">
                                 Experience the latest in mobile technology with this powerful smartphone featuring...
                             </p>
-                            <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                            <button onclick="addToCart('quickViewTitle', parseFloat(document.getElementById('quickViewPrice').textContent.replace('$', '')))" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
                                 Add to Cart
                             </button>
                         </div>
@@ -690,15 +697,28 @@
         </div>
     </div>
 
+    <script src="products.js"></script>
+    <script src="search-feature.js"></script>
+    <script src="filter-feature.js"></script>
     <script>
+       
+
+        
+
+       
+
         // Quick View functionality
-        function openQuickView(productName) {
+        function openQuickView(productId) {
+            const product = products.find(p => p.id === productId);
             const modal = document.getElementById('quickViewModal');
             const modalContent = modal.querySelector('.quick-view-enter');
             
             // Update modal content
-            document.getElementById('quickViewTitle').textContent = productName;
-            document.getElementById('quickViewImage').src = 'https://via.placeholder.com/400x400';
+            document.getElementById('quickViewTitle').textContent = product.name;
+            document.getElementById('quickViewImage').src = product.image;
+            document.getElementById('quickViewPrice').textContent = `$${product.price}`;
+            document.getElementById('quickViewOriginalPrice').textContent = product.originalPrice ? `$${product.originalPrice}` : '';
+            document.getElementById('quickViewDescription').textContent = `Category: ${product.category}, Brand: ${product.brand}, Rating: ${product.rating}, Reviews: ${product.reviews}`;
             
             // Show modal with animation
             modal.classList.remove('hidden');
@@ -727,7 +747,106 @@
 
         // Update countdown every second
         setInterval(updateCountdown, 1000);
-        updateCountdown(); // Initial call
+        updateCountdown(); // Initial callbb
+
+        // Function to update the product grid
+        function updateProductGrid() {
+            const productGrid = document.querySelector('#productGrid');
+            productGrid.innerHTML = '';
+
+            products.forEach(product => {
+                const productCard = `
+                    <div class="bg-white dark:bg-dark-card rounded-lg shadow-lg overflow-hidden group">
+                        <div class="relative">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <button onclick="openQuickView(${product.id})" class="bg-white text-gray-900 px-4 py-2 rounded-lg transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                    Quick View
+                                </button>
+                            </div>
+                            ${product.originalPrice ? `<span class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-sm">-${Math.round((1 - product.price/product.originalPrice) * 100)}%</span>` : ''}
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg mb-2">${product.name}</h3>
+                            <div class="flex items-center mb-2">
+                                <div class="flex text-yellow-400">
+                                    ${getStarRating(product.rating)}
+                                </div>
+                                <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">(${product.reviews})</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-4">
+                                <div>
+                                    ${product.originalPrice ? `<span class="text-gray-500 line-through">FCFA${product.originalPrice}</span>` : ''}
+                                    <span class="text-xl font-bold text-blue-600 dark:text-blue-400">FCFA${product.price}</span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="addToCart('${product.name}', ${product.price})" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Add to Cart
+                                </button>
+                                <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 border rounded-lg" onclick="addToFavourites(${product.id})">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                productGrid.innerHTML += productCard;
+            });
+        }
+
+        // Call updateProductGrid on page load
+        updateProductGrid();
+
+        // Function to add a product to the cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingProduct = cart.find(p => p.id === productId);
+
+            if (existingProduct) {
+                existingProduct.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCounter();
+        }
+
+        // Function to update the cart counter
+        function updateCartCounter() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartCounter = document.getElementById('cartCounter');
+            cartCounter.textContent = cart.reduce((total, product) => total + product.quantity, 0);
+        }
+
+        // Call updateCartCounter on page load
+        updateCartCounter();
+
+        // Add to favourites functionality
+        function addToFavourites(productId) {
+            const product = products.find(p => p.id === productId);
+            let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
+            const existingProduct = favourites.find(p => p.id === productId);
+
+            if (!existingProduct) {
+                favourites.push(product);
+            }
+
+            localStorage.setItem('favourites', JSON.stringify(favourites));
+            updateFavouritesCounter();
+        }
+
+        // Update favourites counter
+        function updateFavouritesCounter() {
+            const favourites = JSON.parse(localStorage.getItem('favourites')) || [];
+            const favouritesCounter = document.getElementById('favouritesCounter');
+            favouritesCounter.textContent = favourites.length;
+        }
+
+        // Call updateFavouritesCounter on page load
+        updateFavouritesCounter();
     </script>
 </body>
 </html>
