@@ -123,7 +123,7 @@
     <nav class="bg-white dark:bg-dark-card shadow sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center p-4">
             <div class="flex items-center">
-                <a href="index.html">
+                <a href="home.html">
                     <img src="https://via.placeholder.com/150x50/3B82F6/FFFFFF?text=TechStore" alt="Logo" class="h-8">
                 </a>
             </div>
@@ -193,9 +193,9 @@
             <thead>
                 <tr class="w-full bg-gray-200 dark:bg-gray-800">
                     <th class="py-3 px-4 text-left">Product</th>
-                    <th class="py-3 px-4 text-left">Price</th>
+                    <th class="py-3 px-4 text-left">Price (FCFA)</th>
                     <th class="py-3 px-4 text-left">Quantity</th>
-                    <th class="py-3 px-4 text-left">Subtotal</th>
+                    <th class="py-3 px-4 text-left">Subtotal (FCFA)</th>
                     <th class="py-3 px-4 text-left">Remove</th>
                 </tr>
             </thead>
@@ -208,7 +208,7 @@
             <h3 class="text-xl font-bold">Apply Coupon Code</h3>
             <div class="flex space-x-2 mt-2">
                 <input type="text" id="couponCode" placeholder="Enter coupon code" class="flex-1 p-2 border rounded-lg">
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg">Apply</button>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg" onclick="applyCoupon()">Apply</button>
             </div>
             <div id="couponError" class="text-red-500 mt-2 hidden">Invalid or expired coupon code.</div>
         </div>
@@ -226,13 +226,13 @@
         </div>
 
         <div class="mt-6">
-            <button class="bg-blue-600 text-white px-6 py-3 rounded-lg">Proceed to Checkout</button>
-            <button class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg ml-4">Continue Shopping</button>
+            <button class="bg-blue-600 text-white px-6 py-3 rounded-lg" onclick="proceedToCheckout()">Proceed to Checkout</button>
+            <button class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg ml-4" onclick="window.location.href='shop.html'">Continue Shopping</button>
         </div>
 
         <div id="emptyCartMessage" class="mt-6 hidden">
             <h3 class="text-xl font-bold">Your cart is empty!</h3>
-            <button class="bg-blue-600 text-white px-6 py-3 rounded-lg mt-2">Start Shopping</button>
+            <button class="bg-blue-600 text-white px-6 py-3 rounded-lg mt-2" onclick="window.location.href='shop.html'">Start Shopping</button>
         </div>
     </div>
 
@@ -296,24 +296,33 @@
         function updateCartItems() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
             const cartItems = document.getElementById('cartItems');
+            const emptyCartMessage = document.getElementById('emptyCartMessage');
+            const cartTable = cartItems.closest('table');
+
             cartItems.innerHTML = '';
 
-            cart.forEach(product => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="py-3 px-4">${product.name || 'N/A'}</td>
-                    <td class="py-3 px-4">FCFA${product.price || 'N/A'}</td>
-                    <td class="py-3 px-4">
-                        <input type="number" value="${product.quantity}" min="1" class="w-16 p-1 border rounded-lg" onchange="updateQuantity(${product.id}, this.value)">
-                    </td>
-                    <td class="py-3 px-4">FCFA${(product.price * product.quantity) || 'N/A'}</td>
-                    <td class="py-3 px-4">
-                        <button class="text-red-600 hover:text-red-800" onclick="removeFromCart(${product.id})">Remove</button>
-                    </td>
-                `;
-                cartItems.appendChild(row);
-            });
-
+            if (cart.length === 0) {
+                cartTable.style.display = 'none';
+                emptyCartMessage.classList.remove('hidden');
+            } else {
+                cartTable.style.display = '';
+                emptyCartMessage.classList.add('hidden');
+                cart.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="py-3 px-4">${product.name ? product.name : 'Unnamed Product'}</td>
+                        <td class="py-3 px-4">${formatCurrency(product.price)}</td>
+                        <td class="py-3 px-4">
+                            <input type="number" value="${product.quantity}" min="1" class="w-16 p-1 border rounded-lg" onchange="updateQuantity(${product.id}, this.value)">
+                        </td>
+                        <td class="py-3 px-4">${formatCurrency(product.price * product.quantity)}</td>
+                        <td class="py-3 px-4">
+                            <button class="text-red-600 hover:text-red-800" onclick="removeFromCart(${product.id})">Remove</button>
+                        </td>
+                    `;
+                    cartItems.appendChild(row);
+                });
+            }
             updateCartTotal();
         }
 
@@ -337,6 +346,12 @@
             updateCartItems();
         }
 
+        // Format currency for FCFA
+        function formatCurrency(amount) {
+            if (typeof amount !== 'number' || isNaN(amount)) return 'N/A';
+            return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' FCFA';
+        }
+
         // Function to update the cart total
         function updateCartTotal() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -344,8 +359,30 @@
             const cartTotal = document.getElementById('cartTotal');
 
             const subtotal = cart.reduce((total, product) => total + product.price * product.quantity, 0);
-            cartSubtotal.textContent = `FCFA${subtotal}`;
-            cartTotal.textContent = `FCFA${subtotal}`;
+            cartSubtotal.textContent = formatCurrency(subtotal);
+            cartTotal.textContent = formatCurrency(subtotal);
+        }
+        // Coupon code logic (simple example)
+        function applyCoupon() {
+            const code = document.getElementById('couponCode').value.trim();
+            const couponError = document.getElementById('couponError');
+            // Example: 10% off for code 'SAVE10'
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let subtotal = cart.reduce((total, product) => total + product.price * product.quantity, 0);
+            if (code === 'SAVE10') {
+                const discount = subtotal * 0.10;
+                const newTotal = subtotal - discount;
+                document.getElementById('cartTotal').textContent = formatCurrency(newTotal);
+                couponError.classList.add('hidden');
+            } else {
+                couponError.classList.remove('hidden');
+                updateCartTotal();
+            }
+        }
+
+        // Proceed to checkout (placeholder)
+        function proceedToCheckout() {
+            alert('Proceeding to checkout... (implement checkout logic)');
         }
 
         // Call updateCartItems on page load

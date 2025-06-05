@@ -11,6 +11,17 @@ let filters = {
 
 // Initialize filters and event listeners
 document.addEventListener('DOMContentLoaded', () => {
+    // Check for category in URL params
+    const params = new URLSearchParams(window.location.search);
+    const categoryParam = params.get('category');
+    if (categoryParam) {
+        document.querySelectorAll('input[name="category"]').forEach(checkbox => {
+            if (checkbox.value.toLowerCase() === categoryParam.toLowerCase()) {
+                checkbox.checked = true;
+                filters.categories.add(checkbox.value);
+            }
+        });
+    }
     // Initialize price range slider
     const priceRange = document.querySelector('input[type="range"]');
     priceRange.addEventListener('input', (e) => {
