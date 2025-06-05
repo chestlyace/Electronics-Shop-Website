@@ -94,7 +94,7 @@
             background: #3b82f6;
             border-radius: 50%;
             cursor: pointer;
-            transition: background .3s ease-in-out;
+            transition: background.3s ease-in-out;
         }
 
         input[type="range"]::-webkit-slider-thumb:hover {
@@ -148,9 +148,12 @@
                         <span id="cartCounter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
                     </a>
                 </div>
-                <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
-                    <i class="fas fa-heart"></i>
-                </a>
+                <div class="relative">
+                    <a href="favorites.html" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                        <i class="fas fa-heart"></i>
+                        <span id="favoritesCounter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </a>
+                </div>
                 <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
                     <i class="fas fa-user"></i>
                 </a>
@@ -310,7 +313,37 @@
                 cart.forEach(product => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td class="py-3 px-4">${product.name ? product.name : 'Unnamed Product'}</td>
+                        <td class="py-3 px-4">${product.name ? product.name : 'Unnamed Product'}
+                            <button class="ml-2 p-1 border rounded-lg" data-product-id="${product.id}" aria-label="Toggle Favorite" onclick="toggleFavourite(${product.id}, this)">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </td>
+    <script>
+    // Toggle favorite status and update button style (reuse logic)
+    function toggleFavourite(productId, btn) {
+        if (isFavourite(productId)) {
+            removeFromFavourites(productId);
+            btn.classList.remove('text-red-500');
+        } else {
+            addToFavourites(productId);
+            btn.classList.add('text-red-500');
+        }
+        updateFavoritesCounter();
+    }
+    // On load, update all favorite buttons and counters
+    function updateFavoritesCounter() {
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        const counter = document.getElementById('favoritesCounter');
+        if (counter) counter.textContent = favorites.length;
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('button[data-product-id]').forEach(btn => {
+            const id = parseInt(btn.getAttribute('data-product-id'));
+            if (isFavourite(id)) btn.classList.add('text-red-500');
+        });
+        updateFavoritesCounter();
+    });
+    </script>
                         <td class="py-3 px-4">${formatCurrency(product.price)}</td>
                         <td class="py-3 px-4">
                             <input type="number" value="${product.quantity}" min="1" class="w-16 p-1 border rounded-lg" onchange="updateQuantity(${product.id}, this.value)">

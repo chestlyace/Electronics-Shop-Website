@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites - TechStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="products.js"></script>
+    <script src="search-feature.js"></script>
+    <script src="filter-feature.js"></script>
+    <style>
+        .favorite {
+            color: #e53e3e;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-dark-bg dark:text-dark-text transition-colors duration-200">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white dark:bg-dark-card shadow sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center p-4">
+            <div class="flex items-center">
+                <a href="home.html">
+                    <img src="images/logo.jpg" alt="Logo" class="h-8">
+                </a>
+            </div>
+            <div class="flex-grow mx-4 relative">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search products..." 
+                        class="w-full p-3 border rounded-lg pl-10 pr-4 dark:bg-gray-800 dark:text-white dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+            <div class="flex items-center space-x-6">
+                <button onclick="toggleDarkMode()" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="relative">
+                    <a href="cart.html" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cartCounter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </a>
+                </div>
+                <div class="relative">
+                    <a href="favorites.html" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                        <i class="fas fa-heart"></i>
+                        <span id="favoritesCounter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="bg-white dark:bg-dark-card shadow-sm">
+        <div class="container mx-auto py-2 px-4">
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="home.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                            <i class="fas fa-home mr-2"></i>
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-blue-600 dark:text-blue-400">Favorites</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Favorites Section -->
+    <div class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold mb-6">Your Favorite Products</h2>
+        <div id="favoritesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Favorite products will be dynamically populated here -->
+        </div>
+        <div id="emptyFavoritesMessage" class="mt-6 hidden">
+            <h3 class="text-xl font-bold">You have no favorite products!</h3>
+            <a href="shop.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg mt-2 inline-block">Browse Products</a>
+        </div>
+    </div>
+
+    <script>
+    // Dark mode toggle (reuse from other pages)
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+    }
+
+    // Update cart and favorites counters
+    function updateCounters() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        document.getElementById('cartCounter').textContent = cart.reduce((t, p) => t + (p.quantity || 1), 0);
+        document.getElementById('favoritesCounter').textContent = favorites.length;
+    }
+
+    // Render favorite products
+    function renderFavorites() {
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        const favoritesList = document.getElementById('favoritesList');
+        const emptyMessage = document.getElementById('emptyFavoritesMessage');
+        favoritesList.innerHTML = '';
+        if (favorites.length === 0) {
+            emptyMessage.classList.remove('hidden');
+            return;
+        } else {
+            emptyMessage.classList.add('hidden');
+        }
+        favorites.forEach(product => {
+            const div = document.createElement('div');
+            div.className = 'bg-white dark:bg-dark-card p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300';
+            div.innerHTML = `
+                <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover rounded-lg mb-4">
+                <h3 class="font-bold text-lg mb-2">${product.name}</h3>
+                <div class="flex items-center mb-2">
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <span class="text-gray-500 text-sm ml-2">(${product.reviews || 0})</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xl font-bold text-blue-600">FCFA${product.price}</span>
+                </div>
+                <button class="bg-red-500 text-white px-4 py-2 rounded-lg w-full" onclick="removeFromFavorites(${product.id})">Remove from Favorites</button>
+            `;
+            favoritesList.appendChild(div);
+        });
+    }
+
+    // Remove from favorites
+    function removeFromFavorites(productId) {
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        favorites = favorites.filter(p => p.id !== productId);
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        updateCounters();
+        renderFavorites();
+    }
+
+    // On page load
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCounters();
+        renderFavorites();
+    });
+    </script>
+</body>
+</html>

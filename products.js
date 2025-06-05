@@ -12,24 +12,34 @@ const products = [
 ];
 
 // Function to add a product to the favourites
+// Unified favorites logic
 function addToFavourites(productId) {
     const product = products.find(p => p.id === productId);
-    let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
-    const existingProduct = favourites.find(p => p.id === productId);
-
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    const existingProduct = favorites.find(p => p.id === productId);
     if (!existingProduct) {
-        favourites.push(product);
+        favorites.push(product);
+        localStorage.setItem('favorites', JSON.stringify(favorites));
     }
-
-    localStorage.setItem('favourites', JSON.stringify(favourites));
+    updateFavouritesCounter();
 }
 
-// Function to update the favourites counter
+function removeFromFavourites(productId) {
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    favorites = favorites.filter(p => p.id !== productId);
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    updateFavouritesCounter();
+}
+
+function isFavourite(productId) {
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    return favorites.some(p => p.id === productId);
+}
+
 function updateFavouritesCounter() {
-    const favourites = JSON.parse(localStorage.getItem('favourites')) || [];
-    const favouritesCounter = document.getElementById('favouritesCounter');
-    favouritesCounter.textContent = favourites.length;
+    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    const counter = document.getElementById('favouritesCounter') || document.getElementById('favoritesCounter');
+    if (counter) counter.textContent = favorites.length;
 }
 
-// Call updateFavouritesCounter on page load
-updateFavouritesCounter();
+document.addEventListener('DOMContentLoaded', updateFavouritesCounter);
