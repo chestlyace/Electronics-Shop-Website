@@ -36,6 +36,8 @@ A modern, responsive e-commerce web application for browsing, filtering, searchi
 2. **Open `home.html` in your browser**
    - No build step is required. All logic is client-side JavaScript.
 
+3. **View the website Online**
+   - open https://ace-electronics.netlify.app
 ## Key Files
 
 - `home.html`: Landing page with hero, categories, and featured products.
