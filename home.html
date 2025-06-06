@@ -614,7 +614,15 @@ document.addEventListener('DOMContentLoaded', function() {
         function updateCartCounter() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
             const cartCounter = document.getElementById('cartCounter');
-            cartCounter.textContent = cart.reduce((total, product) => total + product.quantity, 0);
+            const count = cart.reduce((total, product) => total + (product.quantity || 1), 0);
+            cartCounter.textContent = count;
+            if (count > 0) {
+                cartCounter.classList.remove('bg-gray-300', 'text-gray-400');
+                cartCounter.classList.add('bg-red-500', 'text-white');
+            } else {
+                cartCounter.classList.remove('bg-red-500', 'text-white');
+                cartCounter.classList.add('bg-gray-300', 'text-gray-400');
+            }
         }
 
         // Call updateCartCounter on page load

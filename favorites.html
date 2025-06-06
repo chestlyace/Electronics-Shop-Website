@@ -97,11 +97,25 @@
         localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
     }
 
+    // Apply saved dark mode preference on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+    });
+
     // Update cart and favorites counters
     function updateCounters() {
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        document.getElementById('cartCounter').textContent = cart.reduce((t, p) => t + (p.quantity || 1), 0);
+        const cartCounter = document.getElementById('cartCounter');
+        const count = cart.reduce((t, p) => t + (p.quantity || 1), 0);
+        cartCounter.textContent = count > 0 ? count : '';
+        if (count > 0) {
+            cartCounter.style.display = 'flex';
+        } else {
+            cartCounter.style.display = 'none';
+        }
         document.getElementById('favoritesCounter').textContent = favorites.length;
     }
 
